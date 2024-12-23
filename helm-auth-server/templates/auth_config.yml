@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+data:
+  POSTGRES_DB : "reminder"
+  # DATABASE_URL: "postgresql://supun:postgres1998@localhost:5432/reminder?sslmode=disable"
+  DATABASE_URL: "postgresql://supun:postgres1998@postgres-service-auth:5432/reminder?sslmode=disable"
+
+
+

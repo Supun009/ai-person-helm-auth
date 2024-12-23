@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: 
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Release.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}  
+        ports:
+        - containerPort: {{ .Values.containerPort }}
+        command: ["/bin/sh", "-c"]
+        args:
+          - "{{ .Values.args }}" 
+        env: 
+        - name: POSTGRES_DB
+          valueFrom:  
+            configMapKeyRef:
+              name: {{ .Values.configMap }}
+              key: POSTGRES_DB
+        - name: DATABASE_URL
+          valueFrom:  
+            configMapKeyRef:
+              name: {{ .Values.configMap }}
+              key: DATABASE_URL
+        - name: JWT_SECRET
+          valueFrom:  
+            secretKeyRef:
+              name: {{ .Values.secretName }}
+              key: JWT_SECRET
+        - name: POSTGRES_USER
+          valueFrom:  
+            secretKeyRef:
+              name: {{ .Values.secretName }}
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:  
+            secretKeyRef:
+              name: {{ .Values.secretName }}
+              key: POSTGRES_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.containerPort }}
+      protocol: TCP
+  selector:
+    app: {{ .Release.Name }}
+

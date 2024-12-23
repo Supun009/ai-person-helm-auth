@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  repository: supunprasad/ai-person-auth-server
+  tag: v8
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+containerPort: 3000
+
+
+args: npx knex migrate:latest && node server.js
+
+configMap: auth-config
+  
+secretName: auth-secret
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
