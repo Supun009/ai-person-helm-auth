@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: supunprasad/ai-person-auth-server
-  tag: v8
+  tag: v10
   pullPolicy: IfNotPresent
 
 service:
